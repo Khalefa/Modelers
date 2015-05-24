@@ -10,23 +10,25 @@ namespace Compresser
 {
     class Huffman 
     {
+        public HuffmanTree ht = new HuffmanTree();
         public BitArray compress(int[] data)
         {
-            HuffmanTree ht = new HuffmanTree();
             ht.Frequencies = new Dictionary<int, int>();
-            foreach (int x in data)
+            var sorted_data = data.OrderBy(x => x);
+            foreach (int x in sorted_data)
             {
                 if (ht.Frequencies.ContainsKey(x))
                     ht.Frequencies[x]++;
                 else
                     ht.Frequencies.Add(x, 1);
             }
+
             ht.Build();
             //encode
             BitArray bits = ht.Encode(data);
             return bits;
         }
-        int[] Decode(BitArray bits)
+        int[] Decode(BitArray bits, Dictionary<int, int> freqd)
         {
             int l = bits.subset(0, 32).ToBinary();
             int code_bit = bits.subset(32, 32).ToBinary();
@@ -35,7 +37,7 @@ namespace Compresser
             //read dictonary
             Dictionary< string,int> code_num = new Dictionary<string,int>();
             int indx = 32 * 4;
-             HuffmanTree ht = new HuffmanTree();
+           //  HuffmanTree ht = new HuffmanTree();
              ht.Frequencies = new Dictionary<int, int>();
             for (int i = 0; i < l; i++)
             {
@@ -47,6 +49,8 @@ namespace Compresser
                 //code_num.Add(code, number);
                 //ht.AddCode(code,number);
             }
+            if(freqd!=null)
+            ht.Frequencies = freqd;
             ht.Build();
             List<Node> ns = ht.GetLeaves();
             foreach (Node n in ns)
@@ -68,9 +72,9 @@ namespace Compresser
             return data.ToArray();
         }
 
-        public int[] uncompress(System.Collections.BitArray bits)
+        public int[] uncompress(System.Collections.BitArray bits, Dictionary<int, int> freq=null)
         {
-            return Decode(bits);
+            return Decode(bits,freq );
         }
     }
     class Node : PriorityQueueNode
@@ -244,16 +248,6 @@ namespace Compresser
         }
         public long Size()
         {
-            int size = 0;
-            //  List<Node> ls = new List<Node>();
-
-            //foreach (string x in Frequencies.Keys)
-            //{
-            //    List<bool> l = Root.Traverse(x, new List<bool>());
-            //    size += l.Count() * Frequencies[x];
-
-            //}
-
             return Root.Frequency();
         }
 
@@ -288,7 +282,7 @@ namespace Compresser
         {
             List<bool> dict = new List<bool>();
             int min = codes.Keys.Min();
-            foreach (int x in codes.Keys)
+            foreach (int x in codes.Keys.OrderBy(x=>x))
             {
                 dict.AddRange((x - min).tobinary(symbol_bits));
                 dict.AddRange(Frequencies[x].tobinary(code_bit));

@@ -10,7 +10,7 @@ namespace Compresser
 {
     class Program
     {
-        static double[] readfile(string filename,int part)
+        static double[] readfile(string filename,int part=0)
         {
             List<double> l = new List<double>();
             StreamReader sr = new StreamReader(filename);

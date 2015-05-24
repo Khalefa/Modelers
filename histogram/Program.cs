@@ -257,35 +257,95 @@ namespace histogram
             BitArray bits = c.compress(data);
             return bits.Count;
         }
-        static void Main(string[] args)
+        static public int[] delta( int[] x)
         {
-            double[] data = readfile("c:/data/hannes/preds-hourly.csv",8);
-            var d = Array.ConvertAll(data, x => (int)x);
-            ArrayList ch = new ArrayList();
-            var aas=getStorage(d, ch, 2);
-
-            Console.WriteLine(estimate(d) / data.Count());
-            aas = aas / 8;
-            Console.WriteLine(aas );
-            var data_c = d. Distinct().Count();
+            int[] y = new int[x.Length - 1];
+            for (int i = 1; i < x.Length; i++)
+            {
+                y[i - 1] = x[i] - x[i - 1];
+            }
+            return y;
+        }
+       static  void FindBestModel(int[] data){
+            Console.WriteLine("direct:\t" + estimate(data) / data.Count());
+            Console.WriteLine("delta direct:\t" + estimate(delta(data)) / data.Count());
+            //aas = aas / 8;
+            //Console.WriteLine(aas );
+            /*var data_c = d. Distinct().Count();
             var t = parition(d, (int)Median(d));
-            Console.WriteLine((estimate(t.Item1.ToArray()) + estimate(t.Item2.ToArray())) / data.Count());
+            Console.WriteLine((estimate(t.Item1.ToArray()) + estimate(t.Item2.ToArray())) / data.Count());*/
             /*for (int i = 1; i <= 300; i *= 2)
             {
                 long s = s_part(d, i);
                 Console.WriteLine(i + "\t" + s + "\t" + s / data.Length);
             }*/
-            int k = 1024*4;
-            Console.WriteLine();
+            int k = 1024 * 4;
+            //Console.WriteLine();
             //for (int j = 1; j<30; j++)
             {
 
-                long ts = s_part_limit(d, k);
-                long ts_2 = s_part_limit_2(d, k);
-                long ts_hufman=huffman(d);
-                Console.WriteLine(k + "\t" + ts + "\t" + ts / data.Length+ "\t"+ts_2+ "\t"+ts_2/data.Length+ts_hufman/data.Length);
+                long ts = s_part_limit(data, k);
+                long ts_2 = s_part_limit_2(data, k);
+                long ts_hufman = huffman(data);
+                float data_length = data.Length;
+                long ts_hufman_delta = huffman(delta(data));
+                Console.WriteLine("ts \t" + ts  / data_length + "\n" +
+                    "limit\t" + ts_2 / data_length + "\n" +
+                    "huffman\t" + ts_hufman / data_length + "\n" +
+                    "hufman delta" + ts_hufman_delta / data_length);
+
+                //test compress and decompress
+                Huffman ht = new Huffman();
+                Huffman h = new Huffman();
+                BitArray bits = ht.compress(delta(data));
+                int[] o = ht.uncompress(bits);
+                bool match = true;
+                int x = 0;
+                int[] dd = delta(data);
+                for (int i = 0; i < o.Length; i++)
+                {
+                    if (dd[i] != o[i])
+                    {
+                        match = false; x++;
+                    }
+
+                }
+                if (match)
+                    Console.Write("Match is sucsseful");
+                else
+                    Console.WriteLine("Error in huffman encoding");
                 k = k * 2;
             }
+        }
+
+        static void Main(string[] args)
+        {
+            double[] data = readfile("c:/data/hannes/preds-hourly.csv",8);
+            var d = Array.ConvertAll(data, x => (int)x);
+            FindBestModel(d);
+            return;
+           //double[] data = readfile("c:/data/khalefa/test_huffman1.txt", 0);
+            
+            d = delta(d);
+            Huffman h = new Huffman();
+            Huffman hh = new Huffman();
+            var bits = h.compress(d);
+            var xbits = hh.uncompress(bits,null);
+            bool match = true;
+            int xx = 0;
+            for (int i = 0; i < d.Length; i++)
+            {
+                if (xbits[i] != d[i])
+                {
+                    match = false; xx++;
+                }
+
+            }
+            if (match)
+                Console.Write("Match is sucsseful");
+            else
+                Console.WriteLine("Error in huffman encoding");
+             
         }
 
     }

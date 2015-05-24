@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Compresser", "Compresser\Co
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "histogram", "histogram\histogram.csproj", "{3B077BA4-F279-4C69-AB4A-AE1B74500783}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Compress", "Compress\Compress.csproj", "{2A005D90-E3C9-45ED-8678-7DD1B53BB832}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Model", "Model\Model.csproj", "{FD7D323A-5A97-4061-BF7C-8E60C3C982ED}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,6 +29,14 @@ Global
 		{3B077BA4-F279-4C69-AB4A-AE1B74500783}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3B077BA4-F279-4C69-AB4A-AE1B74500783}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3B077BA4-F279-4C69-AB4A-AE1B74500783}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2A005D90-E3C9-45ED-8678-7DD1B53BB832}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A005D90-E3C9-45ED-8678-7DD1B53BB832}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2A005D90-E3C9-45ED-8678-7DD1B53BB832}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2A005D90-E3C9-45ED-8678-7DD1B53BB832}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FD7D323A-5A97-4061-BF7C-8E60C3C982ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FD7D323A-5A97-4061-BF7C-8E60C3C982ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FD7D323A-5A97-4061-BF7C-8E60C3C982ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FD7D323A-5A97-4061-BF7C-8E60C3C982ED}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
