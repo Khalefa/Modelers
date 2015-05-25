@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Utils;
 
-namespace Compresser
+namespace compress
 {
     class Huffman 
     {
@@ -71,11 +71,16 @@ namespace Compresser
             
             return data.ToArray();
         }
-
         public int[] uncompress(System.Collections.BitArray bits, Dictionary<int, int> freq=null)
         {
             return Decode(bits,freq );
         }
+        public static long huffman(int[] data)
+        {
+            Huffman c = new Huffman();
+            BitArray bits = c.compress(data);
+            return bits.Count;
+        }        
     }
     class Node : PriorityQueueNode
     {
