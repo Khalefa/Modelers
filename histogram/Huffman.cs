@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Utils;
+using histogram;
 
 namespace compress
 {
@@ -78,8 +79,14 @@ namespace compress
         public static long huffman(int[] data)
         {
             Huffman c = new Huffman();
-            BitArray bits = c.compress(data);
+             BitArray bits = c.compress(data);
             return bits.Count;
+        }
+        public static BitArray huffmanb(int[] data)
+        {
+            Huffman c = new Huffman();
+            BitArray bits = c.compress(data);
+            return bits;
         }        
     }
     class Node : PriorityQueueNode
@@ -312,7 +319,7 @@ namespace compress
             {
                 encodedData.AddRange(codes[data[i]]);
             }
-            int data_bits = (int)Math.Ceiling(Math.Log(data.Max() - data.Min(), 2));            
+            int data_bits = (int)Math.Ceiling(Math.Log(data.range(), 2));            
             int code_bits= (int)Math.Ceiling(Math.Log(Frequencies.Values.Max(),2));
 
             encodedSource.AddRange(codes.Count.tobinary(32)); //add the number of item

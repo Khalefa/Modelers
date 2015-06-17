@@ -57,13 +57,14 @@ namespace histogram
             for (int i = 0; i < parts.Length; i++)
                 parts[i] = new List<int>((int)d.Count() / paritions);
 
-            int range = (int)((d.Max() - d.Min()) / paritions);
+
+            int range = (int)(d.Max()/paritions - d.Min() / paritions);
 
             int m = d.Min();
             int[] d_sorted = d.OrderBy(a => a).ToArray();
             for (int i = 0; i < d_sorted.Length; i++)
             {
-                int l = (d_sorted[i] - m) / range;
+                int l = (int)(d_sorted[i]/range - m / range);
                 if (l > paritions) l = paritions;
                 parts[l].Add(d_sorted[i]);
             }

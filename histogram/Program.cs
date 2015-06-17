@@ -11,6 +11,19 @@ namespace histogram
 {
     class Program
     {
+        static double[] readbfile(string filename, int part)
+        {
+            BinaryReader sb = new BinaryReader(File.Open(filename,FileMode.Open));
+            List<Int32> l = new List<int>();
+            while (sb.BaseStream.Position != sb.BaseStream.Length)
+            {
+                int x = sb.ReadInt32();
+                l.Add(x);
+            }
+
+            sb.Close();
+            return Array.ConvertAll(l.ToArray(), z => (double)z);
+        }
         static double[] readfile(string filename, int part)
         {
             List<double> l = new List<double>();
@@ -22,8 +35,8 @@ namespace histogram
                 string line = sr.ReadLine();
                 var parts = line.Split(',');
                 var x = Double.Parse(parts[part]);
-                if (x > 100) x = x - 360;
-                x = x * 100000;
+                //if (x > 100) x = x - 360;
+                x = x * 100 *1000;
                 l.Add(x);
             }
 
@@ -39,7 +52,7 @@ namespace histogram
             long[] s = new long[] { long.MaxValue, long.MaxValue, long.MaxValue, long.MaxValue, long.MaxValue, long.MaxValue };
 
             //raw storage
-            s[0] = (long)Math.Ceiling(Math.Log(num.Max() - num.Min(), 2)) * num.Count();
+            s[0] = (long)Math.Ceiling(Math.Log(num.range(), 2)) * num.Count();
 
             //delta
             int[] d = num.diff();
@@ -86,7 +99,7 @@ namespace histogram
             if (x.Length == 0) return 0;
             if (x.Max() > x.Min())
             {
-                var l = (int)Math.Ceiling(Math.Log(x.Max() - x.Min(), 2));
+                var l = (int)Math.Ceiling(Math.Log((long)x.Max() - (long)x.Min(), 2));
                 return l * x.Count();
             }
             return 1 + (int)Math.Ceiling(Math.Log(x.Count(), 2));
@@ -102,23 +115,9 @@ namespace histogram
         {
             Console.WriteLine("direct:\t" + estimate(data) / data.Count());
             Console.WriteLine("delta direct:\t" + estimate(data.delta()) / data.Count());
-            //aas = aas / 8;
-            //Console.WriteLine(aas );
-            /*var data_c = d. Distinct().Count();
-            var t = parition(d, (int)Median(d));
-            Console.WriteLine((estimate(t.Item1.ToArray()) + estimate(t.Item2.ToArray())) / data.Count());*/
-            /*for (int i = 1; i <= 300; i *= 2)
-            {
-                long s = s_part(d, i);
-                Console.WriteLine(i + "\t" + s + "\t" + s / data.Length);
-            }*/
+            Console.WriteLine("delta direct:\t" + estimate(data.delta().delta()) / data.Count());
+         
             int k = 1024 * 4;
-            //Console.WriteLine();
-            //for (int j = 1; j<30; j++)
-            {
-
-
-                //long ts_2 = s_part_limit_2(data, k);
                 long ts_limit, ts_equ;
                 ts_limit = Histogram.estimate(data, k);
                 ts_equ = Histogram.estimate(data, k, 2);
@@ -130,6 +129,26 @@ namespace histogram
                     "huffman\t" + ts_hufman / data_length + "\n" +
                     "hufman delta" + ts_hufman_delta / data_length);
 
+                BitArray bit_array = Huffman.huffmanb(data.delta());
+                byte [] bytes = new byte[bit_array.Length / 8 + ( bit_array.Length % 8 == 0 ? 0 : 1 )];
+                bit_array.CopyTo( bytes, 0 );
+                File.WriteAllBytes(@"C:/data/hannes/"+col+"hfdelta.bin", bytes);
+
+                byte[] result = new byte[data.Length * sizeof(int)];
+                Buffer.BlockCopy(data, 0, result, 0, result.Length);
+            
+                File.WriteAllBytes(@"C:/data/hannes/"+col+"data.bin", result);
+                var d = data.delta();
+                result = new byte[d.Length * sizeof(int)];  
+                Buffer.BlockCopy(d, 0, result, 0, result.Length);
+                File.WriteAllBytes(@"C:/data/hannes/"+col+"delta.bin", result);
+            /*
+                ts_limit = Histogram.estimate(data.delta(), k);
+                ts_equ = Histogram.estimate(data.delta(), k, 2);
+
+                Console.WriteLine("ts delta" + ts_limit);
+                Console.WriteLine("ts equ" + ts_equ);
+             * 
                 //test compress and decompress
                 Huffman ht = new Huffman();
                 Huffman h = new Huffman();
@@ -149,15 +168,58 @@ namespace histogram
                     Console.Write("Match is sucsseful");
                 else
                     Console.WriteLine("Error in huffman encoding");
-                k = k * 2;
-            }
+               
+             */
+            k = k * 2;
+            
         }
 
+        static int col = 10-1;
+        static void freq(int[] d)
+        {
+            Dictionary<List<int>, int> f = new Dictionary<List<int>, int>();
+            foreach (int x in d)
+            {
+                List<int> h = new List<int>();
+                h.Add(x);
+                if (f.ContainsKey(h))
+                    f[h]++;
+                else f.Add(h, 1);
+
+            }
+          //  Tuple<int, int> t = new Tuple<string, int>("Hello", 4);
+
+            for (int i = 0; i < d.Length - 1; i++)
+            {
+            //    Tuple<int, int> t = new Tuple<int, int>(d[i], d[i + 1]);
+                List<int> h = new List<int>();
+                h.Add(d[i]);
+                h.Add(d[i+1]);
+                if (f.ContainsKey(h))
+                    f[h]++;
+                else f.Add(h, 1);
+            }
+
+            List<KeyValuePair<List<int>, int>> myList = f.ToList();
+
+            myList.Sort((firstPair, nextPair) =>
+            {
+                return nextPair.Value.CompareTo(firstPair.Value);
+            }
+            );
+        }
         static void Main(string[] args)
         {
-            double[] data = readfile("c:/data/hannes/preds-hourly.csv", 9);
+           double[] data = readfile("c:/data/hannes/preds-hourly.csv", col);
+
+           var d = Array.ConvertAll(data, x => (int)x);
+          // freq(d.delta());
+           //return;
+
+       //     double[] data = readbfile("c:/data/b.bat", 0);
             //double[] data = readfile("c:/data/khalefa/test_huffman1.txt", 0);
-            var d = Array.ConvertAll(data, x => (int)x);
+            
+            
             FindBestModel(d);
             return;
 

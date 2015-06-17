@@ -64,6 +64,34 @@ namespace histogram
             }
             return y;
         }
-                
+        public static long range(this int[] l)
+        {
+            return ((long)l.Max() - (long)l.Min());
+        }
+        public static long range(this IEnumerable<int> l)
+        {
+            return ((long)l.Max() - (long)l.Min());
+        }
+
+    }
+    class Item
+    {
+        int f;
+        int s;
+        int c;
+        public override bool Equals(object obj)
+        {
+            Item other = (Item)obj;
+            if (other.c != c) return false;
+            if (other.f != f) return false;
+            if (other.s != s) return false;
+            return true;
+        }
+        public Item(int f, int s, int c)
+        {
+            this.f = f;
+            this.s = s;
+            this.c = c;
+        }
     }
 }
